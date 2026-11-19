@@ -1,0 +1,4 @@
+Pillow
+XlsxWriter
+# 탐색기 파일 드래그앤드롭 기능용(미설치 시 프로그램은 기존 파일 선택 방식으로 정상 동작)
+tkinterdnd2
