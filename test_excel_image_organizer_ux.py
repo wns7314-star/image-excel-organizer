@@ -11,7 +11,7 @@ from xml.etree import ElementTree
 from openpyxl import load_workbook
 from PIL import Image, ImageDraw
 
-from excel_image_organizer_ux import (
+from excel_image_organizer_final_ux import (
     DATA_START_ROW,
     GenerationCancelled,
     IMAGE_COLUMN_WIDTH,
@@ -367,7 +367,14 @@ class OrganizerTest(unittest.TestCase):
             workbook = load_workbook(output, data_only=False)
             sheet = workbook["이미지 정리"]
             self.assertEqual(len(sheet._images), 8)
-            self.assertAlmostEqual(sheet.row_dimensions[DATA_START_ROW + 1].height, IMAGE_ROW_HEIGHT)
+            # 엑셀 행 높이는 0.75pt(1픽셀) 단위로만 저장된다. XlsxWriter 3.2.0부터는
+            # 저장 전에 요청값을 정수 픽셀로 반올림하므로(80pt → 107px → 80.25pt),
+            # 버전과 무관하게 '요청한 이미지 셀 높이와 1픽셀 이내로 일치'하는지 본다.
+            self.assertAlmostEqual(
+                sheet.row_dimensions[DATA_START_ROW + 1].height,
+                IMAGE_ROW_HEIGHT,
+                delta=0.75,
+            )
 
             # 이미지 정렬표 첫 열(A)은 행 그룹, 실제 이미지는 B열부터 시작한다.
             self.assertEqual(sheet["A1"].value, "이미지 정렬표")
@@ -420,7 +427,7 @@ class OrganizerTest(unittest.TestCase):
             self.assertEqual(summary.results[0].source_format, "PNG")
 
     def test_svg_content_detection_does_not_depend_on_extension(self) -> None:
-        from excel_image_organizer_ux import _read_svg_source
+        from excel_image_organizer_final_ux import _read_svg_source
 
         svg = (
             b'<svg xmlns="http://www.w3.org/2000/svg" width="20" height="10">'
